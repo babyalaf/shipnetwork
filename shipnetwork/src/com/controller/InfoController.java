@@ -44,6 +44,7 @@ public class InfoController {
 		br.setXx(2);
 		br.setZc(2);
 		br.setYc(1);
+		System.out.println("1");
 		template.convertAndSend("/broker/site", br);
 	}
 }
