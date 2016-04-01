@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.MaTouMapper">
+	<resultMap type="com.pojo.MaTou" id="matouRM">
+        <id property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="position" column="position" />
+        <result property="org" column="org" />
+        <result property="lev" column="lev" />
+    </resultMap>
+     
+   
+   <select id="getMaTouByLoginName" parameterType="String" resultMap="matouRM">
+   		select * from huz_matou where name=#{name}
+   </select>
+   
+   <select id="getAll" resultMap="matouRM">
+   		select * from huz_matou
+   </select>
+</mapper>

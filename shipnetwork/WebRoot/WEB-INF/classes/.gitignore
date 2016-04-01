@@ -1,0 +1,5 @@
+/com
+/applicationContext.xml
+/jdbc.properties
+/logback.xml
+/springmvc.xml

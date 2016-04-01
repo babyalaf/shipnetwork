@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.ShipPhotoMapper">
+	<resultMap type="com.pojo.ShipPhoto" id="spRM">
+        <id property="id" column="id" />
+        <result property="shipId" column="shipId" />
+        <result property="url" column="url" />
+        <result property="time" column="time" />
+    </resultMap>
+   
+   <insert id="add" parameterType="com.pojo.ShipPhoto">
+   		insert into huz_shipphoto(id,shipId,url,time) values(sys_guid(),#{shipId},#{url},sysdate)
+   </insert>
+   
+   <select id="getPhotosByShipId" parameterType="String" resultMap="spRM">
+   		select * from huz_shipphoto where shipId=#{shipId}
+   </select>
+</mapper>

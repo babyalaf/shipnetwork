@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.SiteConfigMapper">
+	<resultMap type="com.pojo.SiteConfig" id="scRM">
+        <id property="id" column="id" />
+        <result property="tag" column="tag" />
+        <result property="no" column="no" />
+        <result property="streamMediaIP" column="streamMediaIP" />
+        <result property="directIP" column="directIP" />
+        <result property="directUserName" column="directUserName" />
+        <result property="directPassword" column="directPassword" />
+        <result property="directChannel" column="directChannel" />
+        <result property="backIP" column="backIP" />
+        <result property="backUserName" column="backUserName" />
+        <result property="backPassword" column="backPassword" />
+        <result property="backChannel" column="backChannel" />
+    </resultMap>
+   
+   <update id="update" parameterType="com.pojo.SiteConfig">
+        update huz_siteconfig 
+        set tag=#{tag},no=#{no},streamMediaIP=#{streamMediaIP},directIP=#{directIP},directUserName=#{directUserName},directPassword=#{directPassword},directChannel=#{directChannel},
+        	backIP=#{backIP},backUserName=#{backUserName},backPassword=#{backPassword},backChannel=#{backChannel}
+        where id=#{id}
+    </update>
+   
+   <select id="getAll" resultMap="scRM">
+   		select * from huz_siteconfig
+   </select>
+</mapper>

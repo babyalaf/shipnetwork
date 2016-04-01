@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.ShipCheckMapper">
+	<resultMap type="com.pojo.ShipCheck" id="scRM">
+        <id property="id" column="id" />
+        <result property="mmsi" column="mmsi" />
+        <result property="name" column="name" />
+        <result property="site" column="site" />
+        <result property="direction" column="direction" />
+        <result property="checkTime" column="checkTime" />
+        <result property="dvrStartTime" column="dvrStartTime" />
+        <result property="dvrEndTime" column="dvrEndTime" />
+        <result property="ais" column="ais" />
+        <result property="report" column="report" />
+        <result property="arrearage" column="arrearage" />
+        <result property="overdue" column="overdue" />
+        <result property="peccancy" column="peccancy" />
+        <result property="blacklist" column="blacklist" />
+    </resultMap>
+   
+   <insert id="add" parameterType="com.pojo.ShipCheck">
+   		insert into huz_shipcheck(id,mmsi,name,site,direction,checkTime,dvrStartTime,dvrEndTime,ais,report,arrearage,overdue,peccancy,blacklist)
+   		values(sys_guid(),#{mmsi},#{name},#{site},#{direction},#{checkTime},#{dvrStartTime},#{dvrEndTime},#{ais},#{report},#{arrearage},#{overdue},#{peccancy},#{blacklist})
+   </insert>
+   
+   <update id="updateShipName" parameterType="com.pojo.ShipCheck">
+   		update huz_shipcheck set name=#{name} where id=#{id}
+   </update>
+   
+   <select id="getById" parameterType="String" resultMap="scRM">
+   		select * from huz_shipcheck where id=#{id}
+   </select>
+   
+   <select id="getCountMonth" parameterType="com.pojo.ShipCheck" resultType="long">
+   		select count(1) from huz_shipcheck sc
+   		where not exists(
+				select 1 from huz_shipcheck sc2 
+        		where sc.id=sc2.id 
+        		and sc2.ais=1 and sc2.report=1 
+        		and sc2.arrearage=0 and sc2.overdue=0 and sc2.peccancy=0 and sc2.blacklist=0
+        		and sc2.site=#{site}
+        		and substr(sc2.checkTime, 0, 7)=#{checkTime}
+        	) and sc.site=#{site}
+        	and substr(sc.checkTime, 0, 7)=#{checkTime}
+   </select>
+   
+   <select id="getBjListMonth" resultMap="scRM">
+		SELECT * FROM (SELECT a.*, ROWNUM rn FROM (
+			select sc.* from huz_shipcheck sc
+			where not exists(
+				select 1 from huz_shipcheck sc2 
+        		where sc.id=sc2.id 
+        		and sc2.ais=1 and sc2.report=1 
+        		and sc2.arrearage=0 and sc2.overdue=0 and sc2.peccancy=0 and sc2.blacklist=0
+        		and sc2.site=#{shipCheck.site}
+        		and substr(sc2.checkTime, 0, 7)=#{shipCheck.checkTime}
+        	) and sc.site=#{shipCheck.site}
+        	and substr(sc.checkTime, 0, 7)=#{shipCheck.checkTime}
+			order by sc.checkTime desc
+<![CDATA[) a WHERE ROWNUM <= #{end} ) WHERE rn > #{start}]]> 
+   </select>
+   
+   <select id="getBjListToday" parameterType="String" resultMap="scRM">
+   SELECT * FROM (SELECT a.*, ROWNUM rn FROM (
+   		select sc.* from huz_shipcheck sc 
+   		where not exists(
+   			select 1 from huz_shipcheck sc2 
+   			where sc.id=sc2.id 
+   			and sc2.ais=1 and sc2.report=1 
+   			and sc2.arrearage=0 and sc2.overdue=0 and sc2.peccancy=0 and sc2.blacklist=0
+   			and substr(sc2.checkTime, 0, 10)=#{today}
+   		) and substr(sc.checkTime, 0, 10)=#{today}
+   		order by sc.checkTime desc
+   <![CDATA[) a WHERE ROWNUM <= 10 ) WHERE rn > 0]]>	
+   </select>
+   
+   <select id="getCount" parameterType="com.pojo.ShipCheck" resultType="long">
+   		select count(1) from huz_shipcheck 
+   		<trim prefix="WHERE" prefixOverrides="AND">  
+		    <if test="site != null and site !='' ">  
+		        AND site=#{site}
+		    </if>  
+		    <if test="name != null and name !='' ">  
+		        AND name like '%'||#{name}||'%' 
+		    </if>
+		    <if test="checkTime != null and checkTime !='' ">  
+		        AND substr(checkTime, 0, 10)=#{checkTime}
+		    </if>
+		    <if test="ais != null and ais !='' ">  
+		        AND ais=#{ais}
+		    </if>
+		    <if test="report != null and report !='' ">  
+		        AND report=#{report}
+		    </if>
+		    <if test="arrearage != null and arrearage !='' ">  
+		        AND arrearage=#{arrearage}
+		    </if>
+		    <if test="overdue != null and overdue !='' ">  
+		        AND overdue=#{overdue}
+		    </if>
+		    <if test="peccancy != null and peccancy !='' ">  
+		        AND peccancy=#{peccancy}
+		    </if>
+		    <if test="blacklist != null and blacklist !='' ">  
+		        AND blacklist=#{blacklist}
+		    </if>
+		</trim>
+   </select>
+   
+   <select id="getList" resultMap="scRM">
+		SELECT * FROM (SELECT a.*, ROWNUM rn FROM (
+			select sc.* from huz_shipcheck sc
+			<trim prefix="WHERE" prefixOverrides="AND">
+				<if test="shipCheck.site != null and shipCheck.site !='' ">
+					AND sc.site=#{shipCheck.site}
+				</if>
+				<if test="shipCheck.name != null and shipCheck.name !='' ">
+					AND sc.name like '%'||#{shipCheck.name}||'%' 
+				</if>
+				<if test="shipCheck.checkTime != null and shipCheck.checkTime !='' ">
+					AND substr(sc.checkTime, 0, 10)=#{shipCheck.checkTime}
+				</if>
+				<if test="shipCheck.ais != null and shipCheck.ais !='' ">  
+			        AND sc.ais=#{shipCheck.ais}
+			    </if>
+			    <if test="shipCheck.report != null and shipCheck.report !='' ">  
+			        AND sc.report=#{shipCheck.report}
+			    </if>
+			    <if test="shipCheck.arrearage != null and shipCheck.arrearage !='' ">  
+			        AND sc.arrearage=#{shipCheck.arrearage}
+			    </if>
+			    <if test="shipCheck.overdue != null and shipCheck.overdue !='' ">  
+			        AND sc.overdue=#{shipCheck.overdue}
+			    </if>
+			    <if test="shipCheck.peccancy != null and shipCheck.peccancy !='' ">  
+			        AND sc.peccancy=#{shipCheck.peccancy}
+			    </if>
+			    <if test="shipCheck.blacklist != null and shipCheck.blacklist !='' ">  
+			        AND sc.blacklist=#{shipCheck.blacklist}
+			    </if>
+			</trim> 
+			order by sc.checkTime desc
+<![CDATA[) a WHERE ROWNUM <= #{end} ) WHERE rn > #{start}]]> 
+   </select>
+</mapper>

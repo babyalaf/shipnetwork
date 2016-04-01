@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.BarChartMapper">
+	<resultMap type="com.pojo.BarChart" id="brRM">
+        <result property="site" column="site" />
+        <result property="total" column="total" />
+    </resultMap>
+   
+   <select id="getFlowList" parameterType="String" resultMap="brRM">
+   		select s.tag as site, count(sc.id) as total
+		from huz_siteconfig s 
+		left join huz_shipcheck sc on s.id=sc.site and substr(sc.checkTime, 0, 4)=#{year}
+		group by s.tag
+   </select>
+   
+   <select id="getPeccancyList" parameterType="String" resultMap="brRM">
+   		select s.tag as site, count(sc.id) as total
+		from huz_siteconfig s 
+		left join huz_shipcheck sc on s.id=sc.site and sc.peccancy=1 and substr(sc.checkTime, 0, 4)=#{year}
+		group by s.tag
+   </select>
+   
+   <select id="getAlarmList" parameterType="String" resultMap="brRM">
+   		select s.tag as site, count(a.site) as total
+		from huz_siteconfig s 
+		left join (
+			select sc.site from huz_shipcheck sc
+			where not exists(
+				select 1 from huz_shipcheck sc2 
+        		where sc.id=sc2.id 
+        		and sc2.ais=1 and sc2.report=1 
+        		and sc2.arrearage=0 and sc2.overdue=0 and sc2.peccancy=0 and sc2.blacklist=0
+        		and substr(sc2.checkTime, 0, 4)=#{year}
+        	) and substr(sc.checkTime, 0, 4)=#{year}
+        ) a on s.id=a.site
+        group by s.tag
+   </select>
+   
+   <select id="getMonthAlarms" parameterType="String" resultMap="brRM">
+   		select sc.site,count(1) as total 
+   		from huz_shipcheck sc
+		where not exists(
+			select 1 from huz_shipcheck sc2 
+       		where sc.id=sc2.id 
+       		and sc2.ais=1 and sc2.report=1 
+       		and sc2.arrearage=0 and sc2.overdue=0 and sc2.peccancy=0 and sc2.blacklist=0
+       		and substr(sc2.checkTime, 0, 7)=#{month}
+       	) and substr(sc.checkTime, 0, 7)=#{month}
+       	group by sc.site
+   </select>
+</mapper>

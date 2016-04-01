@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.UserMapper">
+	<resultMap type="com.pojo.User" id="userRM">
+        <id property="id" column="id" />
+        <result property="loginName" column="loginName" />
+        <result property="password" column="password" />
+        <result property="position" column="position" />
+        <result property="supervise" column="supervise" />
+    </resultMap>
+   
+   <select id="getUserByLoginName" parameterType="String" resultMap="userRM">
+   		select * from huz_user where loginname=#{loginName}
+   </select>
+   
+   <select id="getAll" resultMap="userRM">
+   		select * from huz_user
+   </select>
+</mapper>
