@@ -30,6 +30,7 @@ public class LoginController {
 		session.invalidate();
 		Common.SCMAP = null;
 		Common.SNMAP = null;
+		System.out.println("2");
 		return "redirect:/login.jsp";
 	}
 	
